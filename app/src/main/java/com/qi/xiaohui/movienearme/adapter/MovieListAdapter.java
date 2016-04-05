@@ -2,6 +2,7 @@ package com.qi.xiaohui.movienearme.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -9,15 +10,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.qi.xiaohui.movienearme.R;
+import com.qi.xiaohui.movienearme.model.movies.Movie;
+import com.qi.xiaohui.movienearme.model.movies.Movies;
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 /**
  * Created by TQi on 4/4/16.
  */
 public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.ViewHolder> {
     private Context mContext;
+    private Movies movies;
 
-    public MovieListAdapter(Context context){
+    public MovieListAdapter(Context context, Movies data){
         mContext = context;
+        movies = data;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -36,16 +44,19 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_movies, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-
+        final Movie movie = movies.getMovies().get(position);
+        holder.movieName.setText(movie.getTitle());
+        Picasso.with(mContext).load(movie.getPosters().getDetailed()).into(holder.poster);
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return movies.getMovies().size();
     }
 }
