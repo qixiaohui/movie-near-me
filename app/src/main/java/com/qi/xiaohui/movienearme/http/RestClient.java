@@ -7,7 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by qixiaohui on 4/4/16.
  */
 public class RestClient {
-    static final String baseUrl = "http://api.rottentomatoes.com/api/public/v1.0/lists/movies/";
+    static final String baseUrl = "https://api.themoviedb.org/3/movie/";
 
     public static MoviesGateway getGateway(){
         Retrofit retrofit = new Retrofit.Builder()

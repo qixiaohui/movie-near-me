@@ -8,14 +8,13 @@ import com.qi.xiaohui.movienearme.model.movies.Movies;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.Path;
 
 /**
  * Created by TQi on 2/18/16.
  */
 public interface MoviesGateway {
 
-    @GET("in_theaters.json?apikey=7waqfqbprs7pajbz28mqf6vz&page_limit=25")
+    @GET("now_playing?api_key=bf1eaacae721f1e2efc3b0d0e0b96969")
     Call<Movies> getMovies();
 
 }

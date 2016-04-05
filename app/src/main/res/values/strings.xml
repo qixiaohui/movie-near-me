@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Movie Near Me</string>
+    <string name="poster_base">http://image.tmdb.org/t/p/w300</string>
 </resources>
