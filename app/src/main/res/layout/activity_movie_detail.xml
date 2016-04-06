@@ -9,7 +9,10 @@
         android:id="@+id/placeCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginBottom="2dp"
         android:background="@color/white"
         card_view:cardCornerRadius="@dimen/cardRadius"
         card_view:cardElevation="@dimen/cardElevation">
@@ -58,6 +61,31 @@
                     android:textSize="15dp"
                     android:layout_height="wrap_content"
                     android:layout_width="wrap_content" />
+                <android.support.v7.widget.CardView
+                    xmlns:android="http://schemas.android.com/apk/res/android"
+                    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                    android:layout_alignParentLeft="true"
+                    android:id="@+id/showButton"
+                    android:layout_below="@+id/voteCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    card_view:cardCornerRadius="2dp"
+                    android:layout_marginRight="6dp"
+                    android:layout_marginLeft="6dp"
+                    card_view:cardElevation="6dp">
+
+                    <TextView android:id="@+id/showText"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:paddingTop="1dp"
+                        android:paddingBottom="1dp"
+                        android:gravity="center"
+                        android:paddingLeft="6dp"
+                        android:paddingRight="6dp"
+                        android:textColor="#ffffff"
+                        android:fontFamily="sans-serif-medium"
+                        android:text="Show Description" />
+                </android.support.v7.widget.CardView>
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -80,9 +108,13 @@
         android:layout_height="match_parent"
         app:ael_expanded="false"
         app:ael_duration="500"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         app:ael_interpolator="bounce"
         app:ael_orientation="vertical">
         <TextView
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/movieDes"

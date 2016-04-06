@@ -7,12 +7,15 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.github.aakira.expandablelayout.ExpandableLayout;
+import com.github.aakira.expandablelayout.ExpandableLayoutListener;
 import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
 import com.google.gson.Gson;
 import com.qi.xiaohui.movienearme.R;
@@ -37,6 +40,8 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView voteCount;
     private CircleDisplay voteAverage;
     private TextView movieDes;
+    private CardView showButton;
+    private TextView showText;
     private ExpandableRelativeLayout expandSummary;
 
     @Override
@@ -51,6 +56,47 @@ public class MovieDetailActivity extends AppCompatActivity {
         voteCount = (TextView) findViewById(R.id.voteCount);
         movieDes = (TextView) findViewById(R.id.movieDes);
         expandSummary = (ExpandableRelativeLayout) findViewById(R.id.expandableSummary);
+        showButton = (CardView) findViewById(R.id.showButton);
+        showText = (TextView) findViewById(R.id.showText);
+
+        showButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                expandSummary.toggle();
+            }
+        });
+
+        expandSummary.setListener(new ExpandableLayoutListener() {
+            @Override
+            public void onAnimationStart() {
+
+            }
+
+            @Override
+            public void onAnimationEnd() {
+
+            }
+
+            @Override
+            public void onPreOpen() {
+
+            }
+
+            @Override
+            public void onPreClose() {
+
+            }
+
+            @Override
+            public void onOpened() {
+        ;       showText.setText("Hide Description");
+            }
+
+            @Override
+            public void onClosed() {
+                showText.setText("Show Description");
+            }
+        });
 
         movie = (new Gson()).fromJson(getIntent().getStringExtra(EXTRA_PARAM), Result.class);
 
@@ -63,6 +109,7 @@ public class MovieDetailActivity extends AppCompatActivity {
                     public void onGenerated(Palette palette) {
                         int bgColor = palette.getVibrantColor(getApplicationContext().getResources().getColor(R.color.cardview_dark_background));
                         expandSummary.setBackgroundColor(bgColor);
+                        showButton.setCardBackgroundColor(bgColor);
                         //expandSummary.expand();
                     }
                 });
