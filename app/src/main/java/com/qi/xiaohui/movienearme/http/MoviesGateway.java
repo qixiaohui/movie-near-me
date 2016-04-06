@@ -5,9 +5,13 @@ package com.qi.xiaohui.movienearme.http;
  */
 
 import com.qi.xiaohui.movienearme.model.movies.Movies;
+import com.qi.xiaohui.movienearme.model.theaters.Theater;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Path;
 
 /**
  * Created by TQi on 2/18/16.

@@ -4,6 +4,8 @@ import android.animation.ValueAnimator;
 import android.graphics.Bitmap;
 import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
@@ -13,23 +15,38 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.aakira.expandablelayout.ExpandableLayout;
 import com.github.aakira.expandablelayout.ExpandableLayoutListener;
 import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.qi.xiaohui.movienearme.R;
+import com.qi.xiaohui.movienearme.http.RestClient;
+import com.qi.xiaohui.movienearme.http.ShowTimesGateway;
 import com.qi.xiaohui.movienearme.model.movies.Movies;
 import com.qi.xiaohui.movienearme.model.movies.Result;
+import com.qi.xiaohui.movienearme.model.theaters.Theater;
 import com.qi.xiaohui.movienearme.ui.CircleDisplay;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.io.Console;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 /**
  * Created by TQi on 4/5/16.
  */
-public class MovieDetailActivity extends AppCompatActivity {
+public class MovieDetailActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
     private static final String TAG = "MovieDetailActivity";
     public static final String EXTRA_PARAM = "EXTRA_PARAM";
 
@@ -43,6 +60,10 @@ public class MovieDetailActivity extends AppCompatActivity {
     private CardView showButton;
     private TextView showText;
     private ExpandableRelativeLayout expandSummary;
+
+    private ShowTimesGateway showTimesGateway;
+    private GoogleApiClient googleApiClient;
+    private Location mLastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +79,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         expandSummary = (ExpandableRelativeLayout) findViewById(R.id.expandableSummary);
         showButton = (CardView) findViewById(R.id.showButton);
         showText = (TextView) findViewById(R.id.showText);
+
+        googleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this, this).addApi(Drive.API).addScope(Drive.SCOPE_FILE).build();
 
         showButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,6 +166,20 @@ public class MovieDetailActivity extends AppCompatActivity {
         voteAverage.showValue(movie.getVoteAverage().floatValue()*10 ,100f, true);
         //voteAverage.change(movie.getVoteAverage().intValue());
         startCount();
+
+        showTimesGateway = RestClient.getShowTimesGateway();
+        Call<List<Theater>> theaterCall = showTimesGateway.getTheaters("39","-104", movie.getTitle().replaceAll("[-+.^:,]", "").replaceAll("\\s","").trim());
+        theaterCall.enqueue(new Callback<List<Theater>>() {
+            @Override
+            public void onResponse(Call<List<Theater>> call, Response<List<Theater>> response) {
+                loadRows(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<List<Theater>> call, Throwable t) {
+                Log.e("HTTP ERROR", t.toString());
+            }
+        });
     }
 
     public void startCount(){
@@ -155,5 +192,41 @@ public class MovieDetailActivity extends AppCompatActivity {
             }
         });
         animator.start();
+    }
+
+    private void loadRows(final List<Theater> theaters){
+        Log.i("theaters",Integer.toString(theaters.size()));
+    }
+
+
+
+    @Override
+    protected void onStart() {
+        googleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        googleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                googleApiClient);
+        if (mLastLocation != null) {
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Toast.makeText(getApplicationContext(), "Connect to google play failed", Toast.LENGTH_LONG).show();
     }
 }

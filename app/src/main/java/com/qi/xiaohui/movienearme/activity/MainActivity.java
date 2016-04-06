@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         mLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
         mRecycleView.setLayoutManager(mLayoutManager);
 
-        moviesGateway = RestClient.getGateway();
+        moviesGateway = RestClient.getMoviesGateway();
         Call<Movies> moviesCall = moviesGateway.getMovies();
         moviesCall.enqueue(new Callback<Movies>() {
             @Override
