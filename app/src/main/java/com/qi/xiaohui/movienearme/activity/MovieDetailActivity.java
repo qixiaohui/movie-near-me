@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,6 +28,7 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.qi.xiaohui.movienearme.R;
+import com.qi.xiaohui.movienearme.adapter.TheaterListAdapter;
 import com.qi.xiaohui.movienearme.http.RestClient;
 import com.qi.xiaohui.movienearme.http.ShowTimesGateway;
 import com.qi.xiaohui.movienearme.model.movies.Movies;
@@ -60,6 +63,7 @@ public class MovieDetailActivity extends AppCompatActivity implements GoogleApiC
     private CardView showButton;
     private TextView showText;
     private ExpandableRelativeLayout expandSummary;
+    private RecyclerView listTheater;
 
     private ShowTimesGateway showTimesGateway;
     private GoogleApiClient googleApiClient;
@@ -79,6 +83,9 @@ public class MovieDetailActivity extends AppCompatActivity implements GoogleApiC
         expandSummary = (ExpandableRelativeLayout) findViewById(R.id.expandableSummary);
         showButton = (CardView) findViewById(R.id.showButton);
         showText = (TextView) findViewById(R.id.showText);
+        listTheater = (RecyclerView) findViewById(R.id.theaterList);
+        listTheater.setHasFixedSize(true);
+        listTheater.setLayoutManager(new LinearLayoutManager(this));
 
         googleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this, this).addApi(Drive.API).addScope(Drive.SCOPE_FILE).build();
 
@@ -163,7 +170,7 @@ public class MovieDetailActivity extends AppCompatActivity implements GoogleApiC
         voteAverage.setDrawInnerCircle(true);
         voteAverage.setUnit("");
         voteAverage.setDrawText(true);
-        voteAverage.showValue(movie.getVoteAverage().floatValue()*10 ,100f, true);
+        voteAverage.showValue(movie.getVoteAverage().floatValue() * 10, 100f, true);
         //voteAverage.change(movie.getVoteAverage().intValue());
         startCount();
 
@@ -195,7 +202,7 @@ public class MovieDetailActivity extends AppCompatActivity implements GoogleApiC
     }
 
     private void loadRows(final List<Theater> theaters){
-        Log.i("theaters",Integer.toString(theaters.size()));
+        listTheater.setAdapter(new TheaterListAdapter(theaters));
     }
 
 
