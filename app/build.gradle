@@ -17,6 +17,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildscript {
+        repositories {
+            jcenter()
+        }
+    }
 }
 
 dependencies {
@@ -30,4 +35,6 @@ dependencies {
     compile 'com.google.code.gson:gson:1.7.2'
     compile 'com.squareup.retrofit2:retrofit:2.0.0-beta4'
     compile 'com.squareup.retrofit2:converter-gson:2.0.0-beta4'
+    compile 'uk.co.chrisjenx:calligraphy:2.1.0'
+    compile 'com.github.aakira:expandable-layout:1.4.3@aar'
 }
