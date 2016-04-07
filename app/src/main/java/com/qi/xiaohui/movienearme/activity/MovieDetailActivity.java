@@ -2,6 +2,7 @@ package com.qi.xiaohui.movienearme.activity;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Movie;
@@ -9,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -23,6 +25,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.github.aakira.expandablelayout.ExpandableLayout;
 import com.github.aakira.expandablelayout.ExpandableLayoutListener;
@@ -73,9 +76,11 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
     private TextView showText;
     private ExpandableRelativeLayout expandSummary;
     private RecyclerView listTheater;
+    private ImageView trailer;
 
     private ShowTimesGateway showTimesGateway;
     private LocationManager locationManager;
+    private Location location;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +97,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
         showButton = (CardView) findViewById(R.id.showButton);
         showText = (TextView) findViewById(R.id.showText);
         listTheater = (RecyclerView) findViewById(R.id.theaterList);
+        trailer = (ImageView) findViewById(R.id.trailer);
         listTheater.setHasFixedSize(true);
         listTheater.setLayoutManager(new LinearLayoutManager(this));
 
@@ -220,7 +226,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
                     MY_PERMISSION_ACCESS_FINE_LOCATION);
         }
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         if(location != null && location.getTime() > Calendar.getInstance().getTimeInMillis() - 2 * 60 * 1000) {
             getShowtimes(location);
@@ -230,7 +236,9 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
     }
 
     private void loadRows(final List<Theater> theaters){
-        listTheater.setAdapter(new TheaterListAdapter(theaters));
+        TheaterListAdapter theaterListAdapter = new TheaterListAdapter(theaters, location);
+        theaterListAdapter.setMovieDetailActivity(MovieDetailActivity.this);
+        listTheater.setAdapter(theaterListAdapter);
     }
 
     @Override
@@ -259,5 +267,18 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
     @Override
     public void onProviderDisabled(String provider) {
 
+    }
+
+    public void renderTrailer(final String url){
+        if(trailer.getVisibility() == View.GONE){
+            trailer.setVisibility(View.VISIBLE);
+            trailer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(browserIntent);
+                }
+            });
+        }
     }
 }

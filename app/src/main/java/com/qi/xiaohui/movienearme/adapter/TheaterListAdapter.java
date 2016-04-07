@@ -4,6 +4,8 @@ import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -11,6 +13,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,22 +30,28 @@ import com.qi.xiaohui.movienearme.activity.MovieDetailActivity;
 import com.qi.xiaohui.movienearme.model.theaters.Theater;
 import com.qi.xiaohui.movienearme.service.LocationService;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by TQi on 4/6/16.
  */
 public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.ViewHolder>{
+    final private String TAG = "TheaterListAdapter";
     private final List<Theater> theaters;
     private Context mContext;
+    private Location location;
+    private MovieDetailActivity movieDetailActivity;
 
     private SparseBooleanArray sparseBooleanArray = new SparseBooleanArray();
 
-    public TheaterListAdapter(final List<Theater> theaters){
+    public TheaterListAdapter(final List<Theater> theaters, Location location){
         this.theaters = theaters;
         for(int i=0; i<theaters.size(); i++){
             sparseBooleanArray.append(i, false);
         }
+        this.location = location;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -67,6 +76,10 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Theater theater = theaters.get(position);
         final Resources resources = mContext.getResources();
+        Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+        if(theaters.get(0).getMovie().get(0).getTrailer() != null && movieDetailActivity != null){
+            movieDetailActivity.renderTrailer(theaters.get(0).getMovie().get(0).getTrailer());
+        }
         holder.textView.setText(theater.getName());
         holder.itemView.setBackgroundColor(mContext.getResources().getColor(R.color.lightGrey));
         holder.expandableRelativeLayout.setBackgroundColor(mContext.getResources().getColor(R.color.darkGrey));
@@ -98,6 +111,10 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
     @Override
     public int getItemCount() {
         return theaters.size();
+    }
+
+    public void setMovieDetailActivity(MovieDetailActivity movieDetailActivity){
+        this.movieDetailActivity = movieDetailActivity;
     }
 
     private ObjectAnimator createRotationAnimation(final View target, final float from, final float to){

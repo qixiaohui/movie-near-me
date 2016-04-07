@@ -30,6 +30,15 @@
                 android:layout_alignParentTop="true"
                 android:scaleType="centerCrop"
                 android:id="@+id/poster" />
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginTop="50dp"
+                android:layout_centerHorizontal="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/live_play_icon"
+                android:visibility="gone"
+                android:id="@+id/trailer" />
             <LinearLayout
                 android:id="@+id/movieNameHolder"
                 android:layout_width="match_parent"
