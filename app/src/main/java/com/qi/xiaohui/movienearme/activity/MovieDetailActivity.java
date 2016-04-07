@@ -49,7 +49,7 @@ import retrofit2.Response;
 /**
  * Created by TQi on 4/5/16.
  */
-public class MovieDetailActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks{
+public class MovieDetailActivity extends AppCompatActivity {
     private static final String TAG = "MovieDetailActivity";
     public static final String EXTRA_PARAM = "EXTRA_PARAM";
 
@@ -86,8 +86,6 @@ public class MovieDetailActivity extends AppCompatActivity implements GoogleApiC
         listTheater = (RecyclerView) findViewById(R.id.theaterList);
         listTheater.setHasFixedSize(true);
         listTheater.setLayoutManager(new LinearLayoutManager(this));
-
-        googleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this, this).addApi(Drive.API).addScope(Drive.SCOPE_FILE).build();
 
         showButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,6 +125,8 @@ public class MovieDetailActivity extends AppCompatActivity implements GoogleApiC
                 showText.setText("Show Description");
             }
         });
+
+        expandSummary.setExpanded(true);
 
         movie = (new Gson()).fromJson(getIntent().getStringExtra(EXTRA_PARAM), Result.class);
 
@@ -179,7 +179,9 @@ public class MovieDetailActivity extends AppCompatActivity implements GoogleApiC
         theaterCall.enqueue(new Callback<List<Theater>>() {
             @Override
             public void onResponse(Call<List<Theater>> call, Response<List<Theater>> response) {
-                loadRows(response.body());
+                if(response.body() != null) {
+                    loadRows(response.body());
+                }
             }
 
             @Override
@@ -195,7 +197,7 @@ public class MovieDetailActivity extends AppCompatActivity implements GoogleApiC
         animator.setDuration(1000);
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             public void onAnimationUpdate(ValueAnimator animation) {
-                voteCount.setText("Rate by " + (int) animation.getAnimatedValue()+" people");
+                voteCount.setText("Rate by " + (int) animation.getAnimatedValue() + " people");
             }
         });
         animator.start();
@@ -206,34 +208,4 @@ public class MovieDetailActivity extends AppCompatActivity implements GoogleApiC
     }
 
 
-
-    @Override
-    protected void onStart() {
-        googleApiClient.connect();
-        super.onStart();
-    }
-
-    @Override
-    protected void onStop() {
-        googleApiClient.disconnect();
-        super.onStop();
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                googleApiClient);
-        if (mLastLocation != null) {
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Toast.makeText(getApplicationContext(), "Connect to google play failed", Toast.LENGTH_LONG).show();
-    }
 }
