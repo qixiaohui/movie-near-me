@@ -1,12 +1,17 @@
 package com.qi.xiaohui.movienearme.activity;
 
 import android.animation.ValueAnimator;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Movie;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
@@ -39,6 +44,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.Console;
+import java.util.Calendar;
 import java.util.List;
 
 import retrofit2.Call;
@@ -49,9 +55,12 @@ import retrofit2.Response;
 /**
  * Created by TQi on 4/5/16.
  */
-public class MovieDetailActivity extends AppCompatActivity {
+public class MovieDetailActivity extends AppCompatActivity implements LocationListener{
     private static final String TAG = "MovieDetailActivity";
     public static final String EXTRA_PARAM = "EXTRA_PARAM";
+
+    private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
+    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
 
     private ImageView poster;
     private TextView movieName;
@@ -66,8 +75,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private RecyclerView listTheater;
 
     private ShowTimesGateway showTimesGateway;
-    private GoogleApiClient googleApiClient;
-    private Location mLastLocation;
+    private LocationManager locationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,9 +181,12 @@ public class MovieDetailActivity extends AppCompatActivity {
         voteAverage.showValue(movie.getVoteAverage().floatValue() * 10, 100f, true);
         //voteAverage.change(movie.getVoteAverage().intValue());
         startCount();
+        checkLocation();
+    }
 
+    private void getShowtimes(Location location){
         showTimesGateway = RestClient.getShowTimesGateway();
-        Call<List<Theater>> theaterCall = showTimesGateway.getTheaters("39","-104", movie.getTitle().replaceAll("[-+.^:,]", "").replaceAll("\\s","").trim());
+        Call<List<Theater>> theaterCall = showTimesGateway.getTheaters(Double.toString(location.getLatitude()),Double.toString(location.getLongitude()), movie.getTitle().replaceAll("[-+.^:,]", "").replaceAll("\\s","").trim());
         theaterCall.enqueue(new Callback<List<Theater>>() {
             @Override
             public void onResponse(Call<List<Theater>> call, Response<List<Theater>> response) {
@@ -203,9 +214,50 @@ public class MovieDetailActivity extends AppCompatActivity {
         animator.start();
     }
 
+    private void checkLocation(){
+        if ( ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSION_ACCESS_FINE_LOCATION);
+        }
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        if(location != null && location.getTime() > Calendar.getInstance().getTimeInMillis() - 2 * 60 * 1000) {
+            getShowtimes(location);
+        } else {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
+        }
+    }
+
     private void loadRows(final List<Theater> theaters){
         listTheater.setAdapter(new TheaterListAdapter(theaters));
     }
 
+    @Override
+    public void onLocationChanged(Location location) {
+        if ( ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSION_ACCESS_FINE_LOCATION);
+        }
 
+        if (location != null) {
+            getShowtimes(location);
+            locationManager.removeUpdates(this);
+        }
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }

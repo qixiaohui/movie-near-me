@@ -3,6 +3,7 @@ package com.qi.xiaohui.movienearme.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -23,23 +24,63 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private RecyclerView mRecycleView;
-    private StaggeredGridLayoutManager mLayoutManager;
+    private LinearLayoutManager mLayoutManager;
     private MovieListAdapter movieAdapter;
     private MoviesGateway moviesGateway;
+    private int pageNumber = 1;
+
+    private int visibleItemCount;
+    private int totalItemCount;
+    private int pastVisiblesItems;
+
+    private Boolean loading = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mRecycleView = (RecyclerView) findViewById(R.id.list);
-        mLayoutManager = new StaggeredGridLayoutManager(1, StaggeredGridLayoutManager.VERTICAL);
+        mLayoutManager = new LinearLayoutManager(this);
         mRecycleView.setLayoutManager(mLayoutManager);
 
+        loadMovies();
+
+        mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) //check for scroll down
+                {
+                    visibleItemCount = mLayoutManager.getChildCount();
+                    totalItemCount = mLayoutManager.getItemCount();
+                    pastVisiblesItems = mLayoutManager.findLastVisibleItemPosition();
+
+                    if (loading) {
+                        if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                            loading = false;
+                            pageNumber++;
+                            loadMovies();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void loadMovies(){
         moviesGateway = RestClient.getMoviesGateway();
-        Call<Movies> moviesCall = moviesGateway.getMovies();
+        Call<Movies> moviesCall = moviesGateway.getMovies(pageNumber);
         moviesCall.enqueue(new Callback<Movies>() {
             @Override
             public void onResponse(Call<Movies> call, Response<Movies> response) {
-                loadRows(response.body());
+                if(pageNumber ==1) {
+                    loadRows(response.body());
+                }else if(pageNumber > 1){
+                    Movies moreMovies = movieAdapter.getMovies();
+                    moreMovies.getResults().addAll(response.body().getResults());
+                    movieAdapter.setMovies(moreMovies);
+                    movieAdapter.notifyItemRangeChanged(movieAdapter.getItemCount()+1, moreMovies.getResults().size());
+                }
             }
 
             @Override

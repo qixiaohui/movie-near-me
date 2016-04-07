@@ -18,8 +18,11 @@ import android.widget.TextView;
 import com.qi.xiaohui.movienearme.R;
 import com.qi.xiaohui.movienearme.model.movies.Movies;
 import com.qi.xiaohui.movienearme.model.movies.Result;
+import com.qi.xiaohui.movienearme.model.theaters.Movie;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.util.List;
 
 /**
  * Created by TQi on 4/4/16.
@@ -58,6 +61,14 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
     public interface OnItemClickListener{
         void onItemClick(View view, int position);
+    }
+
+    public void setMovies(Movies movies){
+        this.movies = movies;
+    }
+
+    public Movies getMovies(){
+        return this.movies;
     }
 
     @Override

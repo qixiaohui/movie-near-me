@@ -12,6 +12,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * Created by TQi on 2/18/16.
@@ -19,6 +20,6 @@ import retrofit2.http.Path;
 public interface MoviesGateway {
 
     @GET("now_playing?api_key=bf1eaacae721f1e2efc3b0d0e0b96969")
-    Call<Movies> getMovies();
+    Call<Movies> getMovies(@Query("page") int id);
 
 }

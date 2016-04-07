@@ -2,8 +2,14 @@ package com.qi.xiaohui.movienearme.adapter;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -17,16 +23,19 @@ import com.github.aakira.expandablelayout.ExpandableLayoutListenerAdapter;
 import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
 import com.github.aakira.expandablelayout.Utils;
 import com.qi.xiaohui.movienearme.R;
+import com.qi.xiaohui.movienearme.activity.MovieDetailActivity;
 import com.qi.xiaohui.movienearme.model.theaters.Theater;
+import com.qi.xiaohui.movienearme.service.LocationService;
 
 import java.util.List;
 
 /**
  * Created by TQi on 4/6/16.
  */
-public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.ViewHolder> {
+public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.ViewHolder>{
     private final List<Theater> theaters;
     private Context mContext;
+
     private SparseBooleanArray sparseBooleanArray = new SparseBooleanArray();
 
     public TheaterListAdapter(final List<Theater> theaters){
@@ -58,7 +67,6 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Theater theater = theaters.get(position);
         final Resources resources = mContext.getResources();
-        Location location = 
         holder.textView.setText(theater.getName());
         holder.itemView.setBackgroundColor(mContext.getResources().getColor(R.color.lightGrey));
         holder.expandableRelativeLayout.setBackgroundColor(mContext.getResources().getColor(R.color.darkGrey));
@@ -98,4 +106,5 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
         objectAnimator.setInterpolator(Utils.createInterpolator(Utils.LINEAR_INTERPOLATOR));
         return objectAnimator;
     }
+
 }
