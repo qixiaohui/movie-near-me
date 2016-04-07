@@ -12,10 +12,14 @@ import android.widget.ImageView;
 
 import com.google.gson.Gson;
 import com.qi.xiaohui.movienearme.R;
+import com.qi.xiaohui.movienearme.SharedPreference.MoviePreference;
 import com.qi.xiaohui.movienearme.adapter.MovieListAdapter;
 import com.qi.xiaohui.movienearme.http.MoviesGateway;
 import com.qi.xiaohui.movienearme.http.RestClient;
 import com.qi.xiaohui.movienearme.model.movies.Movies;
+import com.qi.xiaohui.movienearme.model.theaters.Movie;
+
+import java.util.Calendar;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private int totalItemCount;
     private int pastVisiblesItems;
 
+    private Movies movies;
     private Boolean loading = true;
 
     @Override
@@ -43,7 +48,15 @@ public class MainActivity extends AppCompatActivity {
         mLayoutManager = new LinearLayoutManager(this);
         mRecycleView.setLayoutManager(mLayoutManager);
 
-        loadMovies();
+        Calendar calendar = Calendar.getInstance();
+        int current = calendar.get(Calendar.SECOND);
+        int past = MoviePreference.getDate(MainActivity.this);
+        if(past != 0 && current - past > 0 && current - past <  86400){
+            Movies movies = MoviePreference.getMovies(MainActivity.this);
+            loadRows(movies);
+        }else {
+            loadMovies();
+        }
 
         mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -93,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void loadRows( final Movies movies){
+        this.movies = movies;
         movieAdapter = new MovieListAdapter(getApplicationContext(), movies);
         mRecycleView.setAdapter(movieAdapter);
         MovieListAdapter.OnItemClickListener itemClickListener = new MovieListAdapter.OnItemClickListener() {
@@ -105,5 +119,24 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         movieAdapter.setOnItemClickListener(itemClickListener);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(this.movies != null){
+            MoviePreference.setMovies(this.movies, MainActivity.this);
+        }
     }
 }

@@ -58,11 +58,15 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
         public TextView textView;
         public RelativeLayout buttonLayout;
         public ExpandableRelativeLayout expandableRelativeLayout;
+        public TextView theaterAddress;
+        public TextView phoneNumber;
         public ViewHolder(View v){
             super(v);
             textView = (TextView) v.findViewById(R.id.textView);
             buttonLayout = (RelativeLayout) v.findViewById(R.id.button);
             expandableRelativeLayout = (ExpandableRelativeLayout) v.findViewById(R.id.expandableLayout);
+            theaterAddress = (TextView) v.findViewById(R.id.theaterAddress);
+            phoneNumber = (TextView) v.findViewById(R.id.theaterPhone);
         }
     }
 
@@ -81,6 +85,8 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
             movieDetailActivity.renderTrailer(theaters.get(0).getMovie().get(0).getTrailer());
         }
         holder.textView.setText(theater.getName());
+        holder.theaterAddress.setText(theater.getAddress());
+        holder.phoneNumber.setText(theater.getPhoneNumber());
         holder.itemView.setBackgroundColor(mContext.getResources().getColor(R.color.lightGrey));
         holder.expandableRelativeLayout.setBackgroundColor(mContext.getResources().getColor(R.color.darkGrey));
         holder.expandableRelativeLayout.setInterpolator(Utils.createInterpolator(Utils.FAST_OUT_SLOW_IN_INTERPOLATOR));

@@ -98,6 +98,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
         showText = (TextView) findViewById(R.id.showText);
         listTheater = (RecyclerView) findViewById(R.id.theaterList);
         trailer = (ImageView) findViewById(R.id.trailer);
+
         listTheater.setHasFixedSize(true);
         listTheater.setLayoutManager(new LinearLayoutManager(this));
 
