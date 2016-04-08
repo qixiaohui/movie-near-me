@@ -3,6 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+    <ImageView
+        android:layout_centerVertical="true"
+        android:layout_width="40dp"
+        android:layout_height="45dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:id="@+id/map"
+        android:src="@drawable/map"
+        android:paddingLeft="5dp" />
 
     <RelativeLayout
         android:id="@+id/button"
@@ -57,5 +66,11 @@
             android:textColor="@color/white"
             android:id="@+id/theaterPhone"
             android:textSize="12sp" />
+        <TableLayout
+            android:id="@+id/movieTable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/theaterAddress">
+        </TableLayout>
     </com.github.aakira.expandablelayout.ExpandableRelativeLayout>
 </RelativeLayout>

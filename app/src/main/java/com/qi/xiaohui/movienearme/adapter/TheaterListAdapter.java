@@ -18,8 +18,12 @@ import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.aakira.expandablelayout.ExpandableLayoutListener;
 import com.github.aakira.expandablelayout.ExpandableLayoutListenerAdapter;
@@ -27,6 +31,7 @@ import com.github.aakira.expandablelayout.ExpandableRelativeLayout;
 import com.github.aakira.expandablelayout.Utils;
 import com.qi.xiaohui.movienearme.R;
 import com.qi.xiaohui.movienearme.activity.MovieDetailActivity;
+import com.qi.xiaohui.movienearme.model.theaters.Movie;
 import com.qi.xiaohui.movienearme.model.theaters.Theater;
 import com.qi.xiaohui.movienearme.service.LocationService;
 
@@ -60,6 +65,8 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
         public ExpandableRelativeLayout expandableRelativeLayout;
         public TextView theaterAddress;
         public TextView phoneNumber;
+        public ImageView map;
+        public TableLayout movieTable;
         public ViewHolder(View v){
             super(v);
             textView = (TextView) v.findViewById(R.id.textView);
@@ -67,6 +74,8 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
             expandableRelativeLayout = (ExpandableRelativeLayout) v.findViewById(R.id.expandableLayout);
             theaterAddress = (TextView) v.findViewById(R.id.theaterAddress);
             phoneNumber = (TextView) v.findViewById(R.id.theaterPhone);
+            map = (ImageView) v.findViewById(R.id.map);
+            movieTable = (TableLayout) v.findViewById(R.id.movieTable);
         }
     }
 
@@ -91,6 +100,31 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
         holder.expandableRelativeLayout.setBackgroundColor(mContext.getResources().getColor(R.color.darkGrey));
         holder.expandableRelativeLayout.setInterpolator(Utils.createInterpolator(Utils.FAST_OUT_SLOW_IN_INTERPOLATOR));
         holder.expandableRelativeLayout.setExpanded(sparseBooleanArray.get(position));
+        TableRow.LayoutParams rowParam = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        for(Movie movie : theater.getMovie()){
+            TableRow row = new TableRow(mContext);
+            row.setBackgroundResource(R.drawable.row_border);
+            row.setLayoutParams(rowParam);
+            TextView movieName = new TextView(mContext);
+            movieName.setText(movie.getName());
+            movieName.setTextColor(mContext.getResources().getColor(R.color.white));
+            movieName.setPadding(5, 5, 5, 5);
+            movieName.setTextSize(12);
+            row.addView(movieName);
+            holder.movieTable.addView(row);
+        }
+        holder.map.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Geocoder geocoder = new Geocoder(mContext);
+                try {
+                    List<Address> addresses = geocoder.getFromLocationName(theater.getAddress(), 1);
+                    Toast.makeText(mContext, Double.toString(addresses.get(0).getLatitude()), Toast.LENGTH_LONG).show();
+                }catch (IOException e){
+                    Toast.makeText(mContext, "can't get latitude", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
         holder.expandableRelativeLayout.setListener(new ExpandableLayoutListenerAdapter() {
             @Override
             public void onPreOpen() {
