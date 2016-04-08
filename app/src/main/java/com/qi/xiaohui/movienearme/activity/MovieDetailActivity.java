@@ -42,6 +42,7 @@ import com.qi.xiaohui.movienearme.http.ShowTimesGateway;
 import com.qi.xiaohui.movienearme.model.movies.Movies;
 import com.qi.xiaohui.movienearme.model.movies.Result;
 import com.qi.xiaohui.movienearme.model.theaters.Theater;
+import com.qi.xiaohui.movienearme.service.Util;
 import com.qi.xiaohui.movienearme.ui.CircleDisplay;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -49,6 +50,7 @@ import com.squareup.picasso.Target;
 import java.io.Console;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -77,6 +79,8 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
     private ExpandableRelativeLayout expandSummary;
     private RecyclerView listTheater;
     private ImageView trailer;
+    private TextView language;
+    private TextView releaseDate;
 
     private ShowTimesGateway showTimesGateway;
     private LocationManager locationManager;
@@ -98,6 +102,8 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
         showText = (TextView) findViewById(R.id.showText);
         listTheater = (RecyclerView) findViewById(R.id.theaterList);
         trailer = (ImageView) findViewById(R.id.trailer);
+        language = (TextView) findViewById(R.id.locale);
+        releaseDate = (TextView) findViewById(R.id.releaseTime);
 
         listTheater.setHasFixedSize(true);
         listTheater.setLayoutManager(new LinearLayoutManager(this));
@@ -132,7 +138,8 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
 
             @Override
             public void onOpened() {
-        ;       showText.setText("Hide Description");
+                ;
+                showText.setText("Hide Description");
             }
 
             @Override
@@ -144,6 +151,9 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
         expandSummary.setExpanded(true);
 
         movie = (new Gson()).fromJson(getIntent().getStringExtra(EXTRA_PARAM), Result.class);
+
+        language.setText("Language: " + Util.lanLocale(movie.getOriginalLanguage()));
+        releaseDate.setText("Release data: "+movie.getReleaseDate());
 
         Target target = new Target() {
             @Override

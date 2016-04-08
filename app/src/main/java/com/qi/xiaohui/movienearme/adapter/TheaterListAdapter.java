@@ -2,6 +2,7 @@ package com.qi.xiaohui.movienearme.adapter;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Address;
@@ -9,6 +10,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -111,7 +113,7 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
             row.setBackgroundResource(R.drawable.row_border);
             row.setLayoutParams(rowParam);
             TextView movieName = new TextView(mContext);
-            movieName.setText(movie.getName());
+            movieName.setText(movie.getName() + "  " + movie.getRuntime() + "   " + movie.getRating());
             movieName.setTextColor(mContext.getResources().getColor(R.color.white));
             movieName.setPadding(5, 5, 5, 5);
             movieName.setTextSize(12);
@@ -147,12 +149,9 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
             @Override
             public void onClick(View v) {
                 Geocoder geocoder = new Geocoder(mContext);
-                try {
-                    List<Address> addresses = geocoder.getFromLocationName(theater.getAddress(), 1);
-                    Toast.makeText(mContext, Double.toString(addresses.get(0).getLatitude()), Toast.LENGTH_LONG).show();
-                }catch (IOException e){
-                    Toast.makeText(mContext, "can't get latitude", Toast.LENGTH_LONG).show();
-                }
+                String map = "http://maps.google.co.in/maps?q=" + theater.getAddress();
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
+                mContext.startActivity(intent);
             }
         });
         holder.expandableRelativeLayout.setListener(new ExpandableLayoutListenerAdapter() {
