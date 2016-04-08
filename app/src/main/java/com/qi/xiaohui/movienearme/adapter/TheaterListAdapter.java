@@ -19,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -34,6 +35,7 @@ import com.qi.xiaohui.movienearme.activity.MovieDetailActivity;
 import com.qi.xiaohui.movienearme.model.theaters.Movie;
 import com.qi.xiaohui.movienearme.model.theaters.Theater;
 import com.qi.xiaohui.movienearme.service.LocationService;
+import com.qi.xiaohui.movienearme.service.Util;
 
 import java.io.IOException;
 import java.util.List;
@@ -66,7 +68,7 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
         public TextView theaterAddress;
         public TextView phoneNumber;
         public ImageView map;
-        public TableLayout movieTable;
+        public LinearLayout rowContainer;
         public ViewHolder(View v){
             super(v);
             textView = (TextView) v.findViewById(R.id.textView);
@@ -75,7 +77,7 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
             theaterAddress = (TextView) v.findViewById(R.id.theaterAddress);
             phoneNumber = (TextView) v.findViewById(R.id.theaterPhone);
             map = (ImageView) v.findViewById(R.id.map);
-            movieTable = (TableLayout) v.findViewById(R.id.movieTable);
+            rowContainer = (LinearLayout) v.findViewById(R.id.rowContainer);
         }
     }
 
@@ -100,8 +102,11 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
         holder.expandableRelativeLayout.setBackgroundColor(mContext.getResources().getColor(R.color.darkGrey));
         holder.expandableRelativeLayout.setInterpolator(Utils.createInterpolator(Utils.FAST_OUT_SLOW_IN_INTERPOLATOR));
         holder.expandableRelativeLayout.setExpanded(sparseBooleanArray.get(position));
-        TableRow.LayoutParams rowParam = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         for(Movie movie : theater.getMovie()){
+            TableLayout tableLayout = new TableLayout(mContext);
+            TableLayout.LayoutParams tableParam = new TableLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            tableLayout.setLayoutParams(tableParam);
+            TableRow.LayoutParams rowParam = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             TableRow row = new TableRow(mContext);
             row.setBackgroundResource(R.drawable.row_border);
             row.setLayoutParams(rowParam);
@@ -110,8 +115,33 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
             movieName.setTextColor(mContext.getResources().getColor(R.color.white));
             movieName.setPadding(5, 5, 5, 5);
             movieName.setTextSize(12);
+            movieName.setWidth(Util.getScreenSize(mContext)[0]);
             row.addView(movieName);
-            holder.movieTable.addView(row);
+            TableRow.LayoutParams cellLayout = (TableRow.LayoutParams)movieName.getLayoutParams();
+            cellLayout.span = movie.getShowtimes().size();
+            movieName.setLayoutParams(cellLayout);
+            tableLayout.addView(row);
+
+            TableRow.LayoutParams rowParam1 = new TableRow.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            TableRow row1 = new TableRow(mContext);
+            row1.setLayoutParams(rowParam1);
+            int width = Util.getScreenSize(mContext)[0]/movie.getShowtimes().size();
+
+            for(String showTime : movie.getShowtimes()){
+                TextView showTimeText = new TextView(mContext);
+                showTimeText.setText(showTime);
+                showTimeText.setTextColor(mContext.getResources().getColor(R.color.white));
+                showTimeText.setPadding(5, 5, 5, 5);
+                showTimeText.setTextSize(12);
+                showTimeText.setWidth(width);
+                showTimeText.setBackgroundResource(R.drawable.row_border);
+                row1.addView(showTimeText);
+                TableRow.LayoutParams cellLayout1 = (TableRow.LayoutParams)showTimeText.getLayoutParams();
+                cellLayout1.span = 1;
+                showTimeText.setLayoutParams(cellLayout1);
+            }
+            tableLayout.addView(row1);
+            holder.rowContainer.addView(tableLayout);
         }
         holder.map.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,6 +173,7 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
         holder.buttonLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                holder.expandableRelativeLayout.invalidate();
                 holder.expandableRelativeLayout.toggle();
             }
         });
