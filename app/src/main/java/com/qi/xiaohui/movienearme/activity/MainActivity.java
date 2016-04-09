@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayoutManager mLayoutManager;
     private MovieListAdapter movieAdapter;
     private MoviesGateway moviesGateway;
-    private int pageNumber = 1;
+    private int pageNumber = 2;
 
     private int visibleItemCount;
     private int totalItemCount;
@@ -43,21 +43,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        movies = new Gson().fromJson(getIntent().getStringExtra("MOVIES"), Movies.class);
         setContentView(R.layout.activity_main);
         mRecycleView = (RecyclerView) findViewById(R.id.list);
         mLayoutManager = new LinearLayoutManager(this);
         mRecycleView.setLayoutManager(mLayoutManager);
-
-        Calendar calendar = Calendar.getInstance();
-        int current = calendar.get(Calendar.SECOND);
-        int past = MoviePreference.getDate(MainActivity.this);
-        if(past != 0 && current - past > 0 && current - past <  86400){
-            Movies movies = MoviePreference.getMovies(MainActivity.this);
-            loadRows(movies);
-        }else {
-            loadMovies();
-        }
-
+        loadRows(movies);
         mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -69,9 +60,8 @@ public class MainActivity extends AppCompatActivity {
                     pastVisiblesItems = mLayoutManager.findLastVisibleItemPosition();
 
                     if (loading) {
-                        if ((visibleItemCount + pastVisiblesItems) >= totalItemCount) {
+                        if ((visibleItemCount + pastVisiblesItems) >= totalItemCount && movies.getResults().size()<30) {
                             loading = false;
-                            pageNumber++;
                             loadMovies();
                         }
                     }
@@ -86,14 +76,10 @@ public class MainActivity extends AppCompatActivity {
         moviesCall.enqueue(new Callback<Movies>() {
             @Override
             public void onResponse(Call<Movies> call, Response<Movies> response) {
-                if(pageNumber ==1) {
-                    loadRows(response.body());
-                }else if(pageNumber > 1){
-                    Movies moreMovies = movieAdapter.getMovies();
-                    moreMovies.getResults().addAll(response.body().getResults());
-                    movieAdapter.setMovies(moreMovies);
-                    movieAdapter.notifyItemRangeChanged(movieAdapter.getItemCount()+1, moreMovies.getResults().size());
-                }
+                Movies moreMovies = movieAdapter.getMovies();
+                moreMovies.getResults().addAll(response.body().getResults());
+                movieAdapter.setMovies(moreMovies);
+                movieAdapter.notifyItemRangeChanged(movieAdapter.getItemCount()+1, moreMovies.getResults().size());
             }
 
             @Override
@@ -112,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
         MovieListAdapter.OnItemClickListener itemClickListener = new MovieListAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                ImageView poster = (ImageView) view.findViewById(R.id.moviePoster);
                 Intent intent = new Intent(MainActivity.this, MovieDetailActivity.class);
                 intent.putExtra(MovieDetailActivity.EXTRA_PARAM, (new Gson()).toJson(movies.getResults().get(position)));
                 startActivity(intent);
