@@ -79,17 +79,17 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        Target target = new Target() {
+        final Target target = new Target() {
             @Override
             public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                holder.poster.setImageBitmap(bitmap);
-                Palette.generateAsync(bitmap,new Palette.PaletteAsyncListener(){
+                Palette.PaletteAsyncListener listener = new Palette.PaletteAsyncListener() {
                     @Override
                     public void onGenerated(Palette palette) {
                         int bgColor = palette.getVibrantColor(mContext.getResources().getColor(R.color.cardview_dark_background));
                         holder.movieNameHolder.setBackgroundColor(bgColor);
                     }
-                });
+                };
+                Palette.from(bitmap).generate(listener);
             }
 
             @Override
@@ -104,6 +104,7 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.View
         };
         final Result movie = movies.getResults().get(position);
         holder.movieName.setText(movie.getTitle());
+        Picasso.with(mContext).load(mContext.getResources().getString(R.string.poster_base)+movie.getPosterPath()).into(holder.poster);
         Picasso.with(mContext).load(mContext.getResources().getString(R.string.poster_base)+movie.getPosterPath()).into(target);
 
     }

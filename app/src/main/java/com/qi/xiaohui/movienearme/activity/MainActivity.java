@@ -28,7 +28,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private RecyclerView mRecycleView;
-    private LinearLayoutManager mLayoutManager;
+    private StaggeredGridLayoutManager mLayoutManager;
     private MovieListAdapter movieAdapter;
     private MoviesGateway moviesGateway;
     private int pageNumber = 2;
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         movies = new Gson().fromJson(getIntent().getStringExtra("MOVIES"), Movies.class);
         setContentView(R.layout.activity_main);
         mRecycleView = (RecyclerView) findViewById(R.id.list);
-        mLayoutManager = new LinearLayoutManager(this);
+        mLayoutManager = new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL);
         mRecycleView.setLayoutManager(mLayoutManager);
         loadRows(movies);
         mRecycleView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -57,10 +57,11 @@ public class MainActivity extends AppCompatActivity {
                 {
                     visibleItemCount = mLayoutManager.getChildCount();
                     totalItemCount = mLayoutManager.getItemCount();
-                    pastVisiblesItems = mLayoutManager.findLastVisibleItemPosition();
+                    int [] into = new int[3];
+                    mLayoutManager.findLastVisibleItemPositions(into);
 
                     if (loading) {
-                        if ((visibleItemCount + pastVisiblesItems) >= totalItemCount && movies.getResults().size()<30) {
+                        if (visibleItemCount >= 7 && movies.getResults().size()<30) {
                             loading = false;
                             loadMovies();
                         }
