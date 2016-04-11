@@ -236,6 +236,7 @@ public class MovieDetailActivity extends AppCompatActivity{
             ShowtimeFragment showtimeFragment = new ShowtimeFragment();
             showtimeFragment.setMovies(movie);
             showtimeFragment.setMovieDetailActivity(MovieDetailActivity.this);
+            showtimeFragment.setPosition(position);
             return showtimeFragment;
         }
 

@@ -12,6 +12,6 @@ import retrofit2.http.Path;
  * Created by TQi on 4/6/16.
  */
 public interface ShowTimesGateway {
-    @GET("{lat}/{longi}/{movie}")
-    Call<List<Theater>> getTheaters(@Path("lat") String lat, @Path("longi")String longi, @Path("movie")String movie);
+    @GET("{lat}/{longi}/{movie}/{days}")
+    Call<List<Theater>> getTheaters(@Path("lat") String lat, @Path("longi")String longi, @Path("movie")String movie, @Path("days")int days);
 }

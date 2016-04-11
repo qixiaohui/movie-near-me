@@ -55,12 +55,29 @@ public class ShowtimeFragment extends android.support.v4.app.Fragment implements
     private ShowTimesGateway showTimesGateway;
     private Result movie;
     private MovieDetailActivity movieDetailActivity;
+    private TextView date;
+
+    private int position = 0;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         linearLayout = (LinearLayout)inflater.inflate(R.layout.showtime_fragment, container, false);
         listTheater = (RecyclerView) linearLayout.findViewById(R.id.theaterList);
+        date = (TextView) linearLayout.findViewById(R.id.date);
+
+        switch (position){
+            case 0:
+                date.setText("Today");
+                break;
+            case 1:
+                date.setText("Tomorrow");
+                break;
+            case 2:
+                date.setText("Day after tomorrow");
+                break;
+        }
+
         listTheater.setHasFixedSize(true);
         listTheater.setNestedScrollingEnabled(true);
         listTheater.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -153,7 +170,7 @@ public class ShowtimeFragment extends android.support.v4.app.Fragment implements
 
     private void getShowtimes(Location location){
         showTimesGateway = RestClient.getShowTimesGateway();
-        Call<List<Theater>> theaterCall = showTimesGateway.getTheaters(Double.toString(location.getLatitude()),Double.toString(location.getLongitude()), movie.getTitle().replaceAll("[-+.^:,]", "").replaceAll("\\s","").trim());
+        Call<List<Theater>> theaterCall = showTimesGateway.getTheaters(Double.toString(location.getLatitude()),Double.toString(location.getLongitude()), movie.getTitle().replaceAll("[-+.^:,]", "").replaceAll("\\s","").trim(), position);
         theaterCall.enqueue(new Callback<List<Theater>>() {
             @Override
             public void onResponse(Call<List<Theater>> call, Response<List<Theater>> response) {
@@ -167,6 +184,10 @@ public class ShowtimeFragment extends android.support.v4.app.Fragment implements
                 Log.e("HTTP ERROR", t.toString());
             }
         });
+    }
+
+    public void setPosition(int position){
+        this.position = position;
     }
 
 }
