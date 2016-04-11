@@ -17,7 +17,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +62,7 @@ public class ShowtimeFragment extends android.support.v4.app.Fragment implements
         linearLayout = (LinearLayout)inflater.inflate(R.layout.showtime_fragment, container, false);
         listTheater = (RecyclerView) linearLayout.findViewById(R.id.theaterList);
         listTheater.setHasFixedSize(true);
+        listTheater.setNestedScrollingEnabled(true);
         listTheater.setLayoutManager(new LinearLayoutManager(getContext()));
 
         return linearLayout;
