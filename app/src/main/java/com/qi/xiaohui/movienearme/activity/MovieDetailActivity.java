@@ -51,6 +51,7 @@ import java.io.Console;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.jar.Manifest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -207,7 +208,7 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
         theaterCall.enqueue(new Callback<List<Theater>>() {
             @Override
             public void onResponse(Call<List<Theater>> call, Response<List<Theater>> response) {
-                if(response.body() != null) {
+                if (response.body() != null) {
                     loadRows(response.body());
                 }
             }
@@ -235,7 +236,13 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
         if ( ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSION_ACCESS_FINE_LOCATION);
+            ActivityCompat.shouldShowRequestPermissionRationale(MovieDetailActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION);
+        }else{
+            getLocation();
         }
+    }
+
+    private void getLocation(){
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -290,6 +297,20 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
                     startActivity(browserIntent);
                 }
             });
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case MY_PERMISSION_ACCESS_FINE_LOCATION:{
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    getLocation();
+                }else{
+                    Toast.makeText(MovieDetailActivity.this, "Without location access we can't get latest movie shoetimes :-(", Toast.LENGTH_LONG).show();
+                }
+            }
         }
     }
 }
