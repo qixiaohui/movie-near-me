@@ -13,7 +13,11 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
@@ -36,7 +40,7 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.qi.xiaohui.movienearme.R;
-import com.qi.xiaohui.movienearme.adapter.TheaterListAdapter;
+import com.qi.xiaohui.movienearme.fragment.ShowtimeFragment;
 import com.qi.xiaohui.movienearme.http.RestClient;
 import com.qi.xiaohui.movienearme.http.ShowTimesGateway;
 import com.qi.xiaohui.movienearme.model.movies.Movies;
@@ -61,12 +65,9 @@ import retrofit2.Response;
 /**
  * Created by TQi on 4/5/16.
  */
-public class MovieDetailActivity extends AppCompatActivity implements LocationListener{
+public class MovieDetailActivity extends AppCompatActivity{
     private static final String TAG = "MovieDetailActivity";
     public static final String EXTRA_PARAM = "EXTRA_PARAM";
-
-    private static final int MY_PERMISSION_ACCESS_COARSE_LOCATION = 11;
-    private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 12;
 
     private ImageView poster;
     private TextView movieName;
@@ -75,17 +76,13 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
     private TextView voteCount;
     private CircleDisplay voteAverage;
     private TextView movieDes;
-    private CardView showButton;
-    private TextView showText;
     private ExpandableRelativeLayout expandSummary;
-    private RecyclerView listTheater;
     private ImageView trailer;
     private TextView language;
     private TextView releaseDate;
-
-    private ShowTimesGateway showTimesGateway;
-    private LocationManager locationManager;
-    private Location location;
+    private ViewPager viewPager;
+    private CardView showButton;
+    private TextView showText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,15 +96,16 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
         voteCount = (TextView) findViewById(R.id.voteCount);
         movieDes = (TextView) findViewById(R.id.movieDes);
         expandSummary = (ExpandableRelativeLayout) findViewById(R.id.expandableSummary);
-        showButton = (CardView) findViewById(R.id.showButton);
-        showText = (TextView) findViewById(R.id.showText);
-        listTheater = (RecyclerView) findViewById(R.id.theaterList);
         trailer = (ImageView) findViewById(R.id.trailer);
         language = (TextView) findViewById(R.id.locale);
+        showButton = (CardView) findViewById(R.id.showButton);
         releaseDate = (TextView) findViewById(R.id.releaseTime);
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        showText = (TextView) findViewById(R.id.showText);
 
-        listTheater.setHasFixedSize(true);
-        listTheater.setLayoutManager(new LinearLayoutManager(this));
+        ShowtimeAdapter showtimeAdapter = new ShowtimeAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(showtimeAdapter);
+        viewPager.setOffscreenPageLimit(3);
 
         showButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -199,25 +197,6 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
         voteAverage.showValue(movie.getVoteAverage().floatValue() * 10, 100f, true);
         //voteAverage.change(movie.getVoteAverage().intValue());
         startCount();
-        checkLocation();
-    }
-
-    private void getShowtimes(Location location){
-        showTimesGateway = RestClient.getShowTimesGateway();
-        Call<List<Theater>> theaterCall = showTimesGateway.getTheaters(Double.toString(location.getLatitude()),Double.toString(location.getLongitude()), movie.getTitle().replaceAll("[-+.^:,]", "").replaceAll("\\s","").trim());
-        theaterCall.enqueue(new Callback<List<Theater>>() {
-            @Override
-            public void onResponse(Call<List<Theater>> call, Response<List<Theater>> response) {
-                if (response.body() != null) {
-                    loadRows(response.body());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Theater>> call, Throwable t) {
-                Log.e("HTTP ERROR", t.toString());
-            }
-        });
     }
 
     public void startCount(){
@@ -230,61 +209,6 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
             }
         });
         animator.start();
-    }
-
-    private void checkLocation(){
-        if ( ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    MY_PERMISSION_ACCESS_FINE_LOCATION);
-            ActivityCompat.shouldShowRequestPermissionRationale(MovieDetailActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION);
-        }else{
-            getLocation();
-        }
-    }
-
-    private void getLocation(){
-        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-        if(location != null && location.getTime() > Calendar.getInstance().getTimeInMillis() - 2 * 60 * 1000) {
-            getShowtimes(location);
-        } else {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-        }
-    }
-
-    private void loadRows(final List<Theater> theaters){
-        TheaterListAdapter theaterListAdapter = new TheaterListAdapter(theaters, location);
-        theaterListAdapter.setMovieDetailActivity(MovieDetailActivity.this);
-        listTheater.setAdapter(theaterListAdapter);
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        if ( ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    MY_PERMISSION_ACCESS_FINE_LOCATION);
-        }
-
-        if (location != null) {
-            getShowtimes(location);
-            locationManager.removeUpdates(this);
-        }
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
     }
 
     public void renderTrailer(final String url){
@@ -300,17 +224,24 @@ public class MovieDetailActivity extends AppCompatActivity implements LocationLi
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case MY_PERMISSION_ACCESS_FINE_LOCATION:{
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                    getLocation();
-                }else{
-                    Toast.makeText(MovieDetailActivity.this, "Without location access we can't get latest movie shoetimes :-(", Toast.LENGTH_LONG).show();
-                }
-            }
+    private class ShowtimeAdapter extends FragmentStatePagerAdapter{
+
+        public ShowtimeAdapter(FragmentManager fm){
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+
+            ShowtimeFragment showtimeFragment = new ShowtimeFragment();
+            showtimeFragment.setMovies(movie);
+            showtimeFragment.setMovieDetailActivity(MovieDetailActivity.this);
+            return showtimeFragment;
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
         }
     }
 }
