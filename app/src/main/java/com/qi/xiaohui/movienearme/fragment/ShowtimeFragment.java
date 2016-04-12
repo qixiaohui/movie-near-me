@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.silvestrpredko.dotprogressbar.DotProgressBar;
 import com.google.android.gms.maps.LocationSource;
 import com.qi.xiaohui.movienearme.R;
 import com.qi.xiaohui.movienearme.activity.MovieDetailActivity;
@@ -32,6 +33,8 @@ import com.qi.xiaohui.movienearme.http.ShowTimesGateway;
 import com.qi.xiaohui.movienearme.model.movies.Movies;
 import com.qi.xiaohui.movienearme.model.movies.Result;
 import com.qi.xiaohui.movienearme.model.theaters.Theater;
+import com.romainpiel.shimmer.Shimmer;
+import com.romainpiel.shimmer.ShimmerTextView;
 
 import java.util.Calendar;
 import java.util.List;
@@ -56,6 +59,9 @@ public class ShowtimeFragment extends android.support.v4.app.Fragment implements
     private Result movie;
     private MovieDetailActivity movieDetailActivity;
     private TextView date;
+    private DotProgressBar dotProgressBar;
+    private List<Theater> theaters;
+    private ShimmerTextView noResult;
 
     private int position = 0;
 
@@ -65,6 +71,8 @@ public class ShowtimeFragment extends android.support.v4.app.Fragment implements
         linearLayout = (LinearLayout)inflater.inflate(R.layout.showtime_fragment, container, false);
         listTheater = (RecyclerView) linearLayout.findViewById(R.id.theaterList);
         date = (TextView) linearLayout.findViewById(R.id.date);
+        dotProgressBar = (DotProgressBar) linearLayout.findViewById(R.id.dot_progress_bar);
+        noResult = (ShimmerTextView) linearLayout.findViewById(R.id.noResult);
 
         switch (position){
             case 0:
@@ -149,9 +157,20 @@ public class ShowtimeFragment extends android.support.v4.app.Fragment implements
     }
 
     private void loadRows(final List<Theater> theaters){
-        TheaterListAdapter theaterListAdapter = new TheaterListAdapter(theaters, location);
-        theaterListAdapter.setMovieDetailActivity(movieDetailActivity);
-        listTheater.setAdapter(theaterListAdapter);
+        dotProgressBar.setVisibility(View.GONE);
+        listTheater.setVisibility(View.VISIBLE);
+        this.theaters = theaters;
+        if (position == 0) {
+            movieDetailActivity.resizeViewPager(theaters.size());
+        }
+        if(theaters.size() != 0) {
+            TheaterListAdapter theaterListAdapter = new TheaterListAdapter(theaters, location);
+            theaterListAdapter.setMovieDetailActivity(movieDetailActivity);
+            listTheater.setAdapter(theaterListAdapter);
+        }else{
+            noResult.setVisibility(View.VISIBLE);
+            (new Shimmer()).setDuration(3000).start(noResult);
+        }
     }
 
     @Override
@@ -188,6 +207,14 @@ public class ShowtimeFragment extends android.support.v4.app.Fragment implements
 
     public void setPosition(int position){
         this.position = position;
+    }
+
+    public int getMovieCount(){
+        if(theaters != null){
+            return theaters.size();
+        }else{
+            return 0;
+        }
     }
 
 }

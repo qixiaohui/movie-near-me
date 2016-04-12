@@ -25,6 +25,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -52,6 +53,7 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
 import java.io.Console;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -84,6 +86,8 @@ public class MovieDetailActivity extends AppCompatActivity{
     private CardView showButton;
     private TextView showText;
 
+    private ArrayList<ShowtimeFragment> showtimeList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +106,26 @@ public class MovieDetailActivity extends AppCompatActivity{
         releaseDate = (TextView) findViewById(R.id.releaseTime);
         viewPager = (ViewPager) findViewById(R.id.pager);
         showText = (TextView) findViewById(R.id.showText);
+
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if(showtimeList.get(position) != null){
+                    resizeViewPager(showtimeList.get(position).getMovieCount());
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
 
         ShowtimeAdapter showtimeAdapter = new ShowtimeAdapter(getSupportFragmentManager());
         viewPager.setAdapter(showtimeAdapter);
@@ -224,6 +248,12 @@ public class MovieDetailActivity extends AppCompatActivity{
         }
     }
 
+    public void resizeViewPager(int size){
+        int height = size == 0? 300:150*size;
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
+        viewPager.setLayoutParams(params);
+    }
+
     private class ShowtimeAdapter extends FragmentStatePagerAdapter{
 
         public ShowtimeAdapter(FragmentManager fm){
@@ -237,8 +267,10 @@ public class MovieDetailActivity extends AppCompatActivity{
             showtimeFragment.setMovies(movie);
             showtimeFragment.setMovieDetailActivity(MovieDetailActivity.this);
             showtimeFragment.setPosition(position);
+            showtimeList.add(showtimeFragment);
             return showtimeFragment;
         }
+
 
         @Override
         public int getCount() {
