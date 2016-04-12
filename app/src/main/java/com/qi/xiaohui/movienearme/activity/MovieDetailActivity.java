@@ -129,7 +129,7 @@ public class MovieDetailActivity extends AppCompatActivity{
 
         ShowtimeAdapter showtimeAdapter = new ShowtimeAdapter(getSupportFragmentManager());
         viewPager.setAdapter(showtimeAdapter);
-        viewPager.setOffscreenPageLimit(3);
+        viewPager.setOffscreenPageLimit(7);
 
         showButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -274,7 +274,19 @@ public class MovieDetailActivity extends AppCompatActivity{
 
         @Override
         public int getCount() {
-            return 3;
+            return 7;
+        }
+    }
+
+    public void nextShowTimePage(boolean move){
+        //true: forward, false: back
+        int currentPosition = viewPager.getCurrentItem();
+        if(move && currentPosition<=5) {
+            int next = currentPosition+1;
+            viewPager.setCurrentItem(next);
+        }else if(!move && currentPosition>=1){
+            int pre = currentPosition-1;
+            viewPager.setCurrentItem(pre);
         }
     }
 }

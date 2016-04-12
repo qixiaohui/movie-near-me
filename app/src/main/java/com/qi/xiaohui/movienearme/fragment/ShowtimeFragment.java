@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -33,6 +34,7 @@ import com.qi.xiaohui.movienearme.http.ShowTimesGateway;
 import com.qi.xiaohui.movienearme.model.movies.Movies;
 import com.qi.xiaohui.movienearme.model.movies.Result;
 import com.qi.xiaohui.movienearme.model.theaters.Theater;
+import com.qi.xiaohui.movienearme.service.Util;
 import com.romainpiel.shimmer.Shimmer;
 import com.romainpiel.shimmer.ShimmerTextView;
 
@@ -62,6 +64,8 @@ public class ShowtimeFragment extends android.support.v4.app.Fragment implements
     private DotProgressBar dotProgressBar;
     private List<Theater> theaters;
     private ShimmerTextView noResult;
+    private ImageView arrowBack;
+    private ImageView arrowForward;
 
     private int position = 0;
 
@@ -73,18 +77,32 @@ public class ShowtimeFragment extends android.support.v4.app.Fragment implements
         date = (TextView) linearLayout.findViewById(R.id.date);
         dotProgressBar = (DotProgressBar) linearLayout.findViewById(R.id.dot_progress_bar);
         noResult = (ShimmerTextView) linearLayout.findViewById(R.id.noResult);
-
-        switch (position){
-            case 0:
-                date.setText("Today");
-                break;
-            case 1:
-                date.setText("Tomorrow");
-                break;
-            case 2:
-                date.setText("Day after tomorrow");
-                break;
+        arrowBack = (ImageView) linearLayout.findViewById(R.id.arrowBack);
+        arrowForward = (ImageView) linearLayout.findViewById(R.id.arrowForward);
+        date.setText(Util.getDate(position));
+        if(position<=0){
+            arrowBack.setVisibility(View.GONE);
+        }else if(position>=6){
+            arrowForward.setVisibility(View.GONE);
         }
+
+        arrowBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(movieDetailActivity != null){
+                    movieDetailActivity.nextShowTimePage(false);
+                }
+            }
+        });
+
+        arrowForward.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(movieDetailActivity != null){
+                    movieDetailActivity.nextShowTimePage(true);
+                }
+            }
+        });
 
         listTheater.setHasFixedSize(true);
         listTheater.setNestedScrollingEnabled(true);

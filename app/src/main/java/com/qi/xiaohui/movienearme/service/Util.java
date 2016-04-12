@@ -1,9 +1,15 @@
 package com.qi.xiaohui.movienearme.service;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,5 +44,14 @@ public class Util {
         }else{
             return "English";
         }
+    }
+
+    public static String getDate(int futures){
+        Calendar calendar = Calendar.getInstance();
+        DateFormat df = new SimpleDateFormat("E, MMM d, yyyy");
+        Log.i("today&**(",df.format(calendar.getTime()));
+        calendar.add(Calendar.DAY_OF_YEAR, futures);
+        Date futureDate = calendar.getTime();
+        return df.format(futureDate);
     }
 }
