@@ -252,7 +252,7 @@ public class MovieDetailActivity extends AppCompatActivity{
     }
 
     public void resizeViewPager(int size){
-        int height = size == 0? 300:150*size;
+        int height = size == 0? 300:150*size+150;
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
         viewPager.setLayoutParams(params);
     }

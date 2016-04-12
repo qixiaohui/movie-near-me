@@ -65,9 +65,10 @@
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:visibility="gone"
                 android:id="@+id/theaterList"
+                android:background="@color/lightGrey"
                 android:layout_marginTop="25dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:scrollbars="vertical" />
         <com.romainpiel.shimmer.ShimmerTextView
             android:id="@+id/noResult"

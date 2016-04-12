@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RestClient {
     static final String baseUrl = "https://api.themoviedb.org/3/movie/";
-    static final String showTime = "http://10.143.28.80:8082/showtimes/";
+    static final String showTime = "http://showtime-dev.us-west-1.elasticbeanstalk.com/showtimes/";
 
     public static MoviesGateway getMoviesGateway(){
         Retrofit retrofit = new Retrofit.Builder()
