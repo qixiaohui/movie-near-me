@@ -1,5 +1,6 @@
 package com.qi.xiaohui.movienearme.adapter;
 
+import android.Manifest;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.Intent;
@@ -68,17 +69,17 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
         public RelativeLayout buttonLayout;
         public ExpandableRelativeLayout expandableRelativeLayout;
         public TextView theaterAddress;
-        public TextView phoneNumber;
         public ImageView map;
         public LinearLayout rowContainer;
+        public ImageView call;
         public ViewHolder(View v){
             super(v);
             textView = (TextView) v.findViewById(R.id.textView);
             buttonLayout = (RelativeLayout) v.findViewById(R.id.button);
             expandableRelativeLayout = (ExpandableRelativeLayout) v.findViewById(R.id.expandableLayout);
             theaterAddress = (TextView) v.findViewById(R.id.theaterAddress);
-            phoneNumber = (TextView) v.findViewById(R.id.theaterPhone);
             map = (ImageView) v.findViewById(R.id.map);
+            call = (ImageView) v.findViewById(R.id.call);
             rowContainer = (LinearLayout) v.findViewById(R.id.rowContainer);
         }
     }
@@ -99,7 +100,6 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
         }
         holder.textView.setText(theater.getName());
         holder.theaterAddress.setText(theater.getAddress());
-        holder.phoneNumber.setText(theater.getPhoneNumber());
         holder.itemView.setBackgroundColor(mContext.getResources().getColor(R.color.lightGrey));
         holder.expandableRelativeLayout.setBackgroundColor(mContext.getResources().getColor(R.color.darkGrey));
         holder.expandableRelativeLayout.setInterpolator(Utils.createInterpolator(Utils.FAST_OUT_SLOW_IN_INTERPOLATOR));
@@ -152,6 +152,14 @@ public class TheaterListAdapter extends RecyclerView.Adapter<TheaterListAdapter.
                 String map = "http://maps.google.co.in/maps?q=" + theater.getAddress();
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
                 mContext.startActivity(intent);
+            }
+        });
+        holder.call.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(theater.getPhoneNumber()!=null){
+                    movieDetailActivity.call(theater.getPhoneNumber());
+                }
             }
         });
         holder.expandableRelativeLayout.setListener(new ExpandableLayoutListenerAdapter() {

@@ -71,6 +71,8 @@ public class MovieDetailActivity extends AppCompatActivity{
     private static final String TAG = "MovieDetailActivity";
     public static final String EXTRA_PARAM = "EXTRA_PARAM";
 
+    private static final int MY_PERMISSION_CALL_PHONE = 13;
+
     private ImageView poster;
     private TextView movieName;
     private LinearLayout nameBanner;
@@ -86,6 +88,7 @@ public class MovieDetailActivity extends AppCompatActivity{
     private CardView showButton;
     private TextView showText;
 
+    private String phone;
     private ArrayList<ShowtimeFragment> showtimeList = new ArrayList<>();
 
     @Override
@@ -287,6 +290,34 @@ public class MovieDetailActivity extends AppCompatActivity{
         }else if(!move && currentPosition>=1){
             int pre = currentPosition-1;
             viewPager.setCurrentItem(pre);
+        }
+    }
+
+    private void _call(){
+        Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:"+phone));
+        startActivity(intent);
+    }
+
+
+    public void call(String phone){
+        this.phone = phone;
+        if ( ContextCompat.checkSelfPermission(MovieDetailActivity.this, android.Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions(MovieDetailActivity.this, new String[]{android.Manifest.permission.CALL_PHONE},
+                    MY_PERMISSION_CALL_PHONE);
+        }else{
+            _call();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case MY_PERMISSION_CALL_PHONE:{
+                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    _call();
+                }
+            }
         }
     }
 }

@@ -12,7 +12,17 @@
         android:id="@+id/map"
         android:src="@drawable/map"
         android:paddingLeft="5dp" />
-
+    <ImageView
+        android:layout_centerVertical="true"
+        android:paddingTop="10dp"
+        android:paddingBottom="5dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@+id/map"
+        android:layout_alignParentTop="true"
+        android:id="@+id/call"
+        android:src="@drawable/call"
+        android:paddingLeft="5dp" />
     <RelativeLayout
         android:id="@+id/button"
         android:layout_width="48dp"
@@ -35,7 +45,7 @@
         android:layout_toLeftOf="@id/button"
         android:gravity="center"
         android:padding="8dp"
-        android:layout_toRightOf="@+id/map"
+        android:layout_toRightOf="@+id/call"
         android:textColor="@color/white"
         android:textSize="12sp" />
 
@@ -57,15 +67,6 @@
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:id="@+id/theaterAddress"
-            android:textSize="12sp" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="5dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:textColor="@color/white"
-            android:id="@+id/theaterPhone"
             android:textSize="12sp" />
         <TextView
             android:layout_width="wrap_content"
